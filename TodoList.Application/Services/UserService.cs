@@ -9,12 +9,12 @@ public class UserService(IUserRepository _repository) : IUserService
 {
     public async Task<User> CreateAsync(CreateUserDto createUserDto)
     {
-        User? user = await _repository.GetByUsernameAsync(createUserDto.Userame);
+        User? user = await _repository.GetByUsernameAsync(createUserDto.Username);
         if (user != null)
         {
-            throw new InvalidOperationException($"Username '{createUserDto.Userame}' It is already in use.");
+            throw new InvalidOperationException($"Username '{createUserDto.Username}' It is already in use.");
         }
-        User newUser = new(firstName: createUserDto.FirstName, lastName: createUserDto.LastName, username: createUserDto.Userame, password: createUserDto.Password);
+        User newUser = new(firstName: createUserDto.FirstName, lastName: createUserDto.LastName, username: createUserDto.Username, password: createUserDto.Password);
         await _repository.AddAsync(newUser);
         await _repository.SaveChangesAsync();
         return newUser;
@@ -37,14 +37,14 @@ public class UserService(IUserRepository _repository) : IUserService
     public async Task<User> UpdateAsync(int id, UpdateUserDto updateUserDto)
     {
         User user = await GetByIdAsync(id);
-        if (updateUserDto.Userame != null && user.Username != updateUserDto.Userame)
+        if (updateUserDto.Username != null && user.Username != updateUserDto.Username)
         {
-            User? alreadyUser = await _repository.GetByUsernameAsync(updateUserDto.Userame);
+            User? alreadyUser = await _repository.GetByUsernameAsync(updateUserDto.Username);
             if (alreadyUser != null && alreadyUser.ID != user.ID)
             {
-                throw new InvalidOperationException($"Username '{updateUserDto.Userame}' It is already in use by another user.");
+                throw new InvalidOperationException($"Username '{updateUserDto.Username}' It is already in use by another user.");
             }
-            user.UpdateUsername(updateUserDto.Userame);
+            user.UpdateUsername(updateUserDto.Username);
         }
         if (updateUserDto.FirstName != null)
         {

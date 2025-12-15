@@ -15,7 +15,7 @@ public class User
         if (string.IsNullOrWhiteSpace(firstName))
             throw new ArgumentException("FirstName cannot be empty.", nameof(firstName));
         if (string.IsNullOrWhiteSpace(username))
-            throw new ArgumentException("Userame cannot be empty.", nameof(username));
+            throw new ArgumentException("Username cannot be empty.", nameof(username));
         if (string.IsNullOrWhiteSpace(password))
             throw new ArgumentException("Password cannot be empty.", nameof(password));
         FirstName = firstName;
