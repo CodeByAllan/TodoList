@@ -23,6 +23,10 @@ public class UserRepository(Persistence.ApplicationDbContext _applicationDbConte
     {
         return await _applicationDbContext.Users.FindAsync(id);
     }
+    public async Task<User?> GetByUsernameAsync(string username)
+    {
+        return await _applicationDbContext.Users.FirstOrDefaultAsync(u => u.Username == username);
+    }
     public async Task<int> SaveChangesAsync()
     {
         return await _applicationDbContext.SaveChangesAsync();
