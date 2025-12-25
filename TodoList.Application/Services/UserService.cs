@@ -7,19 +7,6 @@ namespace TodoList.Application.Services;
 
 public class UserService(IUserRepository _repository, IPasswordHashService _passwordHashService) : IUserService
 {
-    public async Task<User> CreateAsync(CreateUserDto createUserDto)
-    {
-        User? user = await _repository.GetByUsernameAsync(createUserDto.Username);
-        if (user != null)
-        {
-            throw new InvalidOperationException($"Username '{createUserDto.Username}' It is already in use.");
-        }
-        string hashedPassword = _passwordHashService.HashPassword(createUserDto.Password);
-        User newUser = new(firstName: createUserDto.FirstName, lastName: createUserDto.LastName, username: createUserDto.Username, password: hashedPassword);
-        await _repository.AddAsync(newUser);
-        await _repository.SaveChangesAsync();
-        return newUser;
-    }
     public async Task DeleteAsync(int id)
     {
         User user = await GetByIdAsync(id);

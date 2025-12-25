@@ -1,6 +1,6 @@
 namespace TodoList.Application.Dtos;
 
-public record CreateUserDto
+public record RegisterRequestDto
 {
     public string FirstName { get; init; } = string.Empty;
     public string? LastName { get; init; }

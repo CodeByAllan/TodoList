@@ -8,28 +8,8 @@ public static class UserEndpoints
 {
     public static void MapUserEndpoints(this WebApplication app)
     {
-        var users = app.MapGroup("/users");
-        users.MapPost("/", async (IUserService _service, CreateUserDto request) =>
-        {
-            try
-            {
-                User newUser = await _service.CreateAsync(request);
-                return Results.Created($"/users/{newUser.ID}", newUser);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Results.Conflict(new { message = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                return Results.BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return Results.InternalServerError(new { message = ex.Message });
-            }
-        }).WithName("CreateUser");
-
+        var users = app.MapGroup("/users").RequireAuthorization();
+        
         users.MapGet("/", async (IUserService _service) =>
        {
            try { return Results.Ok(await _service.GetAllAsync()); }
