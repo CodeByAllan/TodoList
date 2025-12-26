@@ -8,7 +8,7 @@ public static class UserEndpoints
 {
     public static void MapUserEndpoints(this WebApplication app)
     {
-        var users = app.MapGroup("/users").RequireAuthorization("OwnerOnly");
+        var users = app.MapGroup("/users").RequireAuthorization("OwnerOnly").WithTags("Users");
         
         users.MapGet("/{id}", async (IUserService _service, int id) =>
         {
@@ -32,7 +32,14 @@ public static class UserEndpoints
             {
                 return Results.InternalServerError(new { message = ex.Message });
             }
-        }).WithName("GetUserById");
+        }).WithName("GetUserById")
+        .WithSummary("Retrieves a user by their ID.")
+        .WithDescription("This endpoint allows an authorized user to retrieve a user's details by providing their ID.")
+        .Produces<User>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status500InternalServerError)
+        .Produces(StatusCodes.Status401Unauthorized);
+
         users.MapPut("/{id}", async (IUserService _service, int id, UpdateUserDto request) =>
         {
             try
@@ -56,7 +63,17 @@ public static class UserEndpoints
             {
                 return Results.InternalServerError(new { message = ex.Message });
             }
-        }).WithName("UpdateUser");
+        }).WithName("UpdateUser")
+        .WithSummary("Updates a user's information.")
+        .WithDescription("This endpoint allows an authorized user to update a user's information by providing their ID and the updated data.")
+        .Produces<User>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status409Conflict)
+        .Produces(StatusCodes.Status500InternalServerError)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Accepts<UpdateUserDto>("application/json");
+
         users.MapDelete("/{id}", async (IUserService _service, int id) =>
         {
             try
@@ -72,6 +89,12 @@ public static class UserEndpoints
             {
                 return Results.InternalServerError(new { message = ex.Message });
             }
-        }).WithName("DeleteUser");
+        }).WithName("DeleteUser")
+        .WithSummary("Deletes a user by their ID.")
+        .WithDescription("This endpoint allows an authorized user to delete a user by providing their ID.")
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status500InternalServerError)
+        .Produces(StatusCodes.Status401Unauthorized);
     }
 }

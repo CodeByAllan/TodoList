@@ -10,7 +10,7 @@ public static class TodoEndpoints
 {
     public static void MapTodoEndpoints(this WebApplication app)
     {
-        var todos = app.MapGroup("/todos").RequireAuthorization();
+        var todos = app.MapGroup("/todos").RequireAuthorization().WithTags("Todos");
 
         todos.MapPost("/", async (ITodoItemService _service, CreateTodoItemDto request, ClaimsPrincipal claimsPrincipal) =>
         {
@@ -27,7 +27,15 @@ public static class TodoEndpoints
             {
                 return Results.InternalServerError(new { message = ex.Message });
             }
-        }).WithName("CreateTodoItem");
+        })
+        .WithName("CreateTodoItem")
+        .WithSummary("Creates a new todo item for the authenticated user.")
+        .WithDescription("This endpoint allows an authenticated user to create a new todo item by providing the necessary details in the request body.")
+        .Produces<TodoItem>(StatusCodes.Status201Created)
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status500InternalServerError)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Accepts<CreateTodoItemDto>("application/json");
 
         todos.MapGet("/", async (ITodoItemService _service, ClaimsPrincipal claimsPrincipal) =>
         {
@@ -36,7 +44,13 @@ public static class TodoEndpoints
             {
                 return Results.InternalServerError(new { message = ex.Message });
             }
-        }).WithName("GetAllTodoItem");
+        })
+        .WithName("GetAllTodoItem")
+        .WithSummary("Retrieves all todo items for the authenticated user.")
+        .WithDescription("This endpoint allows an authenticated user to retrieve all their todo items.")
+        .Produces<List<TodoItem>>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status500InternalServerError)
+        .Produces(StatusCodes.Status401Unauthorized);
 
         todos.MapGet("/{id}", async (ITodoItemService _service, int id, ClaimsPrincipal claimsPrincipal) =>
         {
@@ -60,7 +74,14 @@ public static class TodoEndpoints
             {
                 return Results.InternalServerError(new { message = ex.Message });
             }
-        });
+        })
+        .WithName("GetTodoItemById")
+        .WithSummary("Retrieves a specific todo item by ID for the authenticated user.")
+        .WithDescription("This endpoint allows an authenticated user to retrieve a specific todo item by its ID.")
+        .Produces<TodoItem>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status500InternalServerError)
+        .Produces(StatusCodes.Status401Unauthorized);
 
         todos.MapPut("/{id}", async (ITodoItemService _service, int id, UpdateTodoItemDto request, ClaimsPrincipal claimsPrincipal) =>
         {
@@ -81,7 +102,17 @@ public static class TodoEndpoints
             {
                 return Results.InternalServerError(new { message = ex.Message });
             }
-        });
+        })
+        .WithName("UpdateTodoItem")
+        .WithSummary("Updates a specific todo item by ID for the authenticated user.")
+        .WithDescription("This endpoint allows an authenticated user to update a specific todo item by its ID.")
+        .Produces<TodoItem>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status500InternalServerError)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Accepts<UpdateTodoItemDto>("application/json");
+
         todos.MapDelete("/{id}", async (ITodoItemService _service, int id, ClaimsPrincipal claimsPrincipal) =>
         {
             try
@@ -97,6 +128,13 @@ public static class TodoEndpoints
             {
                 return Results.InternalServerError(new { message = ex.Message });
             }
-        });
+        })
+        .WithName("DeleteTodoItem")
+        .WithSummary("Deletes a specific todo item by ID for the authenticated user.")
+        .WithDescription("This endpoint allows an authenticated user to delete a specific todo item by its ID.")
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status500InternalServerError)
+        .Produces(StatusCodes.Status401Unauthorized);
     }
 }

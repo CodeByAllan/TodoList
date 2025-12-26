@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using TodoList.Api.Endpoints;
 using TodoList.Api.Security;
 using TodoList.Application.Interfaces;
@@ -22,9 +23,30 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "TodoList API",
+        Version = "v1"
+    });
 
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Insert JWT token with Bearer prefix. Example: Bearer {token}"
+    });
+    options.AddSecurityRequirement((document) => new OpenApiSecurityRequirement()
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = ["readAccess", "writeAccess"]
+    });
+});
+// Database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -63,7 +85,7 @@ builder.Services.AddAuthorization();
 // Custom Authorization Policy
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("OwnerOnly", policy => 
+    options.AddPolicy("OwnerOnly", policy =>
         policy.AddRequirements(new IsOwnerRequirement()));
 });
 
@@ -83,7 +105,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoList API v1");
+        options.RoutePrefix = string.Empty;
+    });
 }
 app.UseHttpsRedirection();
 
