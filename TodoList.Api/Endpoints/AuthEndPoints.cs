@@ -7,7 +7,7 @@ public static class AuthEndpoints
 {
     public static void MapAuthEndpoints(this WebApplication app)
     {
-        var auth = app.MapGroup("/auth");
+        var auth = app.MapGroup("/auth").WithTags("Authentication");
         auth.MapPost("/login", async (IAuthService _service, LoginRequestDto request) =>
 {
     try
