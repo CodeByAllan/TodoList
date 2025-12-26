@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using TodoList.Api.Endpoints;
-using TodoList.Api.Security;
 using TodoList.Application.Interfaces;
 using TodoList.Application.Services;
 using TodoList.Config;
@@ -86,10 +85,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Custom Authorization Policy
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("OwnerOnly", policy =>
-        policy.AddRequirements(new IsOwnerRequirement()));
+// Authorization
+builder.Services.AddAuthorization();
 
 // Dependency Injection
 builder.Services.AddScoped<ITodoItemRepository, TodoItemRepository>();
@@ -100,7 +97,6 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IPasswordHashService, PasswordHashService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IAuthorizationHandler, IsOwnerHandler>();
 
 // Build the application
 var app = builder.Build();

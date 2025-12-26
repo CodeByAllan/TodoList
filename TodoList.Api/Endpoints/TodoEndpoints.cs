@@ -10,7 +10,7 @@ public static class TodoEndpoints
 {
     public static void MapTodoEndpoints(this WebApplication app)
     {
-        var todos = app.MapGroup("/todos").RequireAuthorization().WithTags("Todos");
+        var todos = app.MapGroup("/me/todos").RequireAuthorization().WithTags("Todos");
 
         todos.MapPost("/", async (ITodoItemService _service, CreateTodoItemDto request, ClaimsPrincipal claimsPrincipal) =>
         {
